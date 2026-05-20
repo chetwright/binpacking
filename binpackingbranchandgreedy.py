@@ -260,7 +260,7 @@ def branch_and_bound_ffd(capacity, items):
                    # final_bins.append(list(bin.items))
             return #if second case not true than not good solution
           
-         #Pruning method
+         #dfffPruning method
         remaining_items = sorted_items[item_index:]  #all the items which haven't been placed yet
         remaining_items_weight = sum(remaining_items)
         remainder = remaining_items_weight % capacity # see if remaining weight will fit in the bins
@@ -439,8 +439,33 @@ def summarizer(results):
 
         summary.append([capacity,items_count,dist_name,len(matching),avg_bins,avg_time])
     return summary
-
+def run_from1(algorithm):
+    #added this because find_15_minutes doesn't work as hoped
+    #finds the number of bins and the max number of items(starting at 1 item)
+    #which can be packed in 15 minutes, number of items, increases by 1 everytime
+    #perhaps this test along with find_15_minutes can tell something about complexity
+    items = []
+    results = []
+    time_elapsed = 0
+    capacity = 10
+    items_count = 1
+    total_bins_packed = 0
+    total_items_packed = 1
+    algotime = 0
+    algo_time_growth = []
+    while (time_elapsed < 900):
+        items = rand_distributed_set(capacity, items_count)
+        #start = time.perf_counter()
+        time_elapsed = time_elapsed + algotime
+        bins_packed, algotime = algorithm(capacity, items)
+        total_items_packed = total_items_packed + items_count
+        total_bins_packed = total_bins_packed + bins_packed
+        algo_time_growth.append(algotime)
+        items_count +=1
+    
+    return total_bins_packed, items_count, total,items_packed, algo_time_growth
 def find_15_minutes(algorithm):
+    #finds the largest number of items which can be handled in 15 minutes
     time = 0
     longest_time = 0
     items = []
@@ -454,12 +479,14 @@ def find_15_minutes(algorithm):
         if (time > longest_time):
             longest_time = time
         items_count = items_count+1
-    return bins_packed, items_count, time        
+        items_counter
+    return bins_packed, items_count, time
 def main():
     print("Welcome to the bin-packing test suite: ")
     print("1: FFD")
     print("2: Branch-and-Bound")
     print("3: Branch-and-Bound-FFD-upper-bound")
+    print("4: Pack for 15 minutes")
     print("15: Find 15 minutes for all")
     user_in = input("Enter choice of test(1-3,15): ")
     
@@ -475,6 +502,16 @@ def main():
         results = test_runner_bnb_ffd()
         save_raw_csv(results, "bnb_ffd_csv_results.csv")
         save_summary_csv(summarizer(results), "bnb_ffd_summary.csv")
+    elif (user_in == "4"):
+        results = run_from1(branch_and_bound)
+        print("BNB:")
+        print(results)
+        results = run_from1(branch_and_bound_ffd)
+        print("BNBFFD:")
+        print(results)
+        results = run_from1(first_fit_decreasing)
+        print("FFD:")
+        print(results)
     elif (user_in == "15"):
         results = find_15_minutes(branch_and_bound)
         print("BNB:")
