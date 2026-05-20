@@ -455,7 +455,7 @@ def run_from1(algorithm):
     algo_time_growth = []
     while (time_elapsed < 900):
         items = rand_distributed_set(capacity, items_count)
-        #start = time.perf_counter()
+        
         time_elapsed = time_elapsed + algotime
         bins_packed, algotime = algorithm(capacity, items)
         total_items_packed = total_items_packed + items_count
@@ -463,7 +463,7 @@ def run_from1(algorithm):
         algo_time_growth.append(algotime)
         items_count +=1
     
-    return total_bins_packed, items_count, total,items_packed, algo_time_growth
+    return total_bins_packed, items_count, total_items_packed, algo_time_growth
 def find_15_minutes(algorithm):
     #finds the largest number of items which can be handled in 15 minutes
     time = 0
@@ -479,8 +479,16 @@ def find_15_minutes(algorithm):
         if (time > longest_time):
             longest_time = time
         items_count = items_count+1
-        items_counter
+        
     return bins_packed, items_count, time
+def write_csv_15mins(results, filename):
+    total_bins_packed, items_count, total_items_packed, algo_time_growth = results
+    with open(filename, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["item_count", "algo_time"])
+        for i, t in enumerate(algo_time_growth):
+            writer.writerow([i + 1, t])
+
 def main():
     print("Welcome to the bin-packing test suite: ")
     print("1: FFD")
@@ -505,12 +513,15 @@ def main():
     elif (user_in == "4"):
         results = run_from1(branch_and_bound)
         print("BNB:")
+        write_csv_15mins(results,"bnb_15_minute_run.csv")
         print(results)
         results = run_from1(branch_and_bound_ffd)
         print("BNBFFD:")
+        write_csv_15mins(results,"bnbffd_15_minute_run.csv")
         print(results)
         results = run_from1(first_fit_decreasing)
         print("FFD:")
+        write_csv_15mins(results,"ffd_15_minute_run.csv")
         print(results)
     elif (user_in == "15"):
         results = find_15_minutes(branch_and_bound)
